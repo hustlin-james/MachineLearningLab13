@@ -9,7 +9,97 @@ import sys
 #discount facotr gamma
 #e maximum error
 def value_iteration(environment_file,non_terminal_reward,gamma,k_iterations):
+    with open(environment_file) as f:
+        content = f.readlines()
+    content = [x.strip() for x in content] 
+
+    envo = []
+    for c in content:
+        t = []
+        for v in c:
+            t.append(v)
+        envo.append(t)
     
+    global X_MAX
+    global Y_MAX
+
+    X_MAX = len(c[0])
+    Y_MAX = len(c)
+    
+    p = transition((0,0),(0,0),"left")
+    print(p)
+
+def transition(dest,origin,action):
+    dest_x = dest[0]
+    dest_y = dest[1]
+    origin_x = origin[0]
+    origin_y = origin[1]
+
+    p = 0.0
+    #staying same spot
+
+    #change to origin 
+    if dest_x == origin_x and dest_y == origin_y:
+        #left
+        if action == "left":
+            if (dest_x) == -1: p += .8
+            if (dest_y) == -1: p += .1
+            if (dest_y) == Y_MAX: p += .1 
+        #up 
+        if action == "up":
+            if (dest_y) == Y_MAX: p += .8
+            if (dest_x) == -1: p += .1
+            if (dest_x) == X_MAX: p += .1
+        #right 
+        if action == "right":
+            if (dest_x) == X_MAX: p += .8
+            if (dest_y) == Y_MAX: p += .1
+            if (dest_y) == -1: p+=.1
+        #down 
+        if action == "down":
+            if (dest_y) == -1: p+=.8
+            if (dest_x) == X_MAX: p+= .1
+            if (dest_x) == -1: p+= .1   
+    #moving left
+    if dest_x == origin_x - 1 and dest_y == origin_y:   
+        if action == "left":
+            if dest_x != -1:p += .8
+        if action == "up":
+            if (dest_x) != -1: p += .1
+        if action == "right":pass
+        if action == "down":
+            if (dest_x) != -1: p += .1
+    #moving up
+    if dest_x == origin_x and dest_y == origin_y + 1:
+        if action == "left":
+            if (dest_y) != Y_MAX: p += .1
+        if action == "up":
+            if (dest_y) != Y_MAX: p += .8
+        if action == "right": 
+            if(dest_y) != Y_MAX: p+= .1
+        if action == "down": 
+            pass
+    #moving right
+    if dest_x == (origin_x + 1) and dest_y == origin_y:
+        if action == "left":pass
+        if action == "up": 
+            if (dest_x) != X_MAX: p += .1
+        if action == "right": 
+            if(dest_x) != X_MAX: p += .8
+        if action == "down": 
+            if (dest_x) != X_MAX: p += .1
+    #moving down
+    if dest_x == origin_x and dest_y == (origin_y - 1):
+        if action == "left": 
+            if dest_y != -1: p+=.1
+        if action == "up": 
+            if dest_y != -1: pass
+        if action == "right": 
+            if dest_y != -1: p+= .1
+        if action == "down": 
+            if dest_y != -1: p+= .8
+
+    return p  
 
 def main():
     if len(sys.argv)== 5:
