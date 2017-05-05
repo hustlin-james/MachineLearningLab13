@@ -1,0 +1,48 @@
+function [] = value_iteration(filename, non_terminal_reward, gamma, iterations)
+    ut_mat = createutility(filename);    
+    for i = 1:iterations
+        rval=size(ut_mat, 1);
+        cval=size(ut_mat, 2);
+        mat_val = zeros(rval,cval);
+        for p = 1:rval
+            for q = 1:cval
+               if (ut_mat(p, q) == 1)||(ut_mat(p, q) == -1)||(ut_mat(p, q) == 3)
+                   mat_val(p, q) = ut_mat(p, q);
+                   continue 
+               end            
+               if (p - 1) == 0 || ut_mat((p -1), q) == 3
+                   down_mat = ut_mat(p, q);                   
+               elseif (p - 1) > 0
+                   down_mat = ut_mat((p -1), q);
+               end              
+               if (p + 1) > size(ut_mat,1) || ut_mat((p + 1), q) == 3
+                   up_mat = ut_mat(p, q);                   
+               elseif (p + 1) <= size(ut_mat,1)
+                   up_mat = ut_mat((p + 1), q);                             
+               end               
+               if (q - 1) == 0 || ut_mat(p, (q - 1)) == 3
+                   left_mat = ut_mat(p, q);                   
+               elseif (q - 1) > 0
+                   left_mat = ut_mat(p, (q - 1));    
+               end               
+               if (q + 1) > size(ut_mat, 2) || ut_mat(p, (q + 1)) == 3
+                   right_mat = ut_mat(p, q);                   
+               elseif (q + 1) <= size(ut_mat, 2)
+                   right_mat = ut_mat(p, (q + 1));   
+               end               
+               utilty = [right_mat, left_mat, up_mat, down_mat];
+               utilty = utilty';             
+               seq_uti = zeros(4, 1);
+               for x = 1:4
+                  seq_uti(x, 1) = non_terminal_reward + gamma*utilty(x, 1);                   
+               end              
+               exp_util = expectedUtility(seq_uti);                              
+               best_util = max(exp_util);
+               mat_val(p, q) = best_util;
+            end  
+        end
+        ut_mat = mat_val(:, :);
+    end
+    display_output(ut_mat(:, :));    
+    
+end
